@@ -1,9 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using DoctorWho.Db.DatabaseContext;
+using DoctorWho.Db.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace DoctorWho.Db.Repositories
 {
@@ -31,7 +28,7 @@ namespace DoctorWho.Db.Repositories
             _context.Doctors.Add(doctor);
             _context.SaveChanges();
         }
-        
+
         void UpdateDoctor(int doctorId, string newDoctorName, DateTime newBirthDate, int episodeId)
         {
             var doctor = _context.Doctors.FirstOrDefault(d => d.DoctorId == doctorId);
@@ -41,6 +38,11 @@ namespace DoctorWho.Db.Repositories
             {
                 doctor.DoctorName = newDoctorName;
                 doctor.BirthDate = newBirthDate;
+            }
+            else
+            {
+                Console.WriteLine($"No Doctor with id = {doctorId}");
+                return;
             }
             if (episode != null)
             {
@@ -61,7 +63,7 @@ namespace DoctorWho.Db.Repositories
             //var state = _context.ChangeTracker.DebugView.ShortView;
             _context.SaveChanges();
         }
-        public Doctor GetDoctorById(int? doctorId)
+        public Doctor? GetDoctorById(int? doctorId)
         {
             if (doctorId.HasValue)
             {

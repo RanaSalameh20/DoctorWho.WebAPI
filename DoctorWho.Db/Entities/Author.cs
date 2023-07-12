@@ -1,6 +1,4 @@
-﻿
-
-namespace DoctorWho.Db
+﻿namespace DoctorWho.Db.Entities
 {
     public class Author
     {

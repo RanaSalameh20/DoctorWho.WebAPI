@@ -1,4 +1,6 @@
 ﻿using Dapper;
+using DoctorWho.Db.DatabaseContext;
+using DoctorWho.Db.Entities;
 using DoctorWho.Db.ProceduresModels;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;

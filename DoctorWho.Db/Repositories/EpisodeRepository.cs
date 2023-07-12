@@ -1,4 +1,6 @@
 ﻿using Dapper;
+using DoctorWho.Db.DatabaseContext;
+using DoctorWho.Db.Entities;
 using DoctorWho.Db.ViewsModels;
 using Microsoft.Data.SqlClient;
 
@@ -12,15 +14,16 @@ namespace DoctorWho.Db.Repositories
         private readonly string _connectionString;
 
         public EpisodeRepository(DoctorWhoCoreDbContext context,
-            AuthorRepository authorRepository,DoctorRepository doctorRepository
-            ) {
+            AuthorRepository authorRepository, DoctorRepository doctorRepository
+            )
+        {
             _context = context;
             _authorRepository = authorRepository;
             _doctorRepository = doctorRepository;
             _connectionString = "Server=(localdb)\\MSSQLLocalDB;Database=DoctorWhoCore;Trusted_Connection=True;";
 
         }
-        void CreateEpisode(int seriesNumber, int episodeNumber, string episodeType, string title, DateTime episodeDate, int authorId, int? doctorId)
+        public void CreateEpisode(int seriesNumber, int episodeNumber, string episodeType, string title, DateTime episodeDate, int authorId, int? doctorId)
         {
             var author = _authorRepository.GetAuthorById(authorId);
             if (author != null)
@@ -47,7 +50,7 @@ namespace DoctorWho.Db.Repositories
             }
 
         }
-        void UpdateEpisode(int episodeId, string newEpisodeTitle, DateTime newEpisodeDate, int newAuthorId)
+        public void UpdateEpisode(int episodeId, string newEpisodeTitle, DateTime newEpisodeDate, int newAuthorId)
         {
             var episode = _context.Episodes.FirstOrDefault(e => e.EpisodeId == episodeId);
             var author = _context.Authors.FirstOrDefault(a => a.AuthorId == newAuthorId);
@@ -56,6 +59,11 @@ namespace DoctorWho.Db.Repositories
             {
                 episode.Title = newEpisodeTitle;
                 episode.EpisodeDate = newEpisodeDate;
+            }
+            else
+            {
+                Console.WriteLine($"No episode with id = {episodeId}");
+                return;
             }
             if (author != null)
             {
@@ -66,7 +74,7 @@ namespace DoctorWho.Db.Repositories
             _context.SaveChanges();
             Console.WriteLine("done");
         }
-        void DeleteEpisode(int episodeId)
+        public void DeleteEpisode(int episodeId)
         {
             var episode = _context.Episodes.FirstOrDefault(e => e.EpisodeId == episodeId);
 
@@ -77,7 +85,7 @@ namespace DoctorWho.Db.Repositories
 
             _context.SaveChanges();
         }
-        void AddEnemyToEpisode()
+        public void AddEnemyToEpisode()
         {
             var enemy1 = _context.Enemies.Find(1);
             var enemy2 = _context.Enemies.Find(2);
@@ -88,7 +96,7 @@ namespace DoctorWho.Db.Repositories
 
             _context.SaveChanges();
         }
-        void addCompanionToEpisode()
+        public void addCompanionToEpisode()
         {
             var companion1 = _context.Companions.Find(4);
             var companion2 = _context.Companions.Find(5);
@@ -103,7 +111,7 @@ namespace DoctorWho.Db.Repositories
 
             _context.SaveChanges();
         }
-        void EpisodesView()
+        public void EpisodesView()
         {
             using (var connection = new SqlConnection(_connectionString))
             {

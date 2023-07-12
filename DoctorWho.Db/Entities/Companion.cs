@@ -4,17 +4,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DoctorWho.Db
+namespace DoctorWho.Db.Entities
 {
-    public class Enemy
+    public class Companion
     {
-        public Enemy()
+        public Companion()
         {
             Episodes = new List<Episode>();
         }
-        public int EnemyId { get; set; }
-        public string EnemyName { get; set; }
-        public string Description { get; set; }
+
+        public int CompanionId { get; set; }
+        public string CompanionName { get; set; }
+        public string WhoPlayed { get; set; }
 
         public ICollection<Episode> Episodes { get; set; }
     }

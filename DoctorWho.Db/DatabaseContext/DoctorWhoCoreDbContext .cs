@@ -4,8 +4,9 @@ using System.Numerics;
 using System;
 using DoctorWho.Db.ProceduresModels;
 using System.Reflection;
+using DoctorWho.Db.Entities;
 
-namespace DoctorWho.Db
+namespace DoctorWho.Db.DatabaseContext
 {
     public class DoctorWhoCoreDbContext : DbContext
     {
@@ -74,6 +75,6 @@ namespace DoctorWho.Db
             );
 
         }
-        
+
     }
 }

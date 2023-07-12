@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DoctorWho.Db
+namespace DoctorWho.Db.Entities
 {
     public class Doctor
     {
@@ -16,8 +16,8 @@ namespace DoctorWho.Db
         public int DoctorNumber { get; set; }
         public string DoctorName { get; set; }
         public DateTime BirthDate { get; set; }
-        public DateTime FirstEpisodeDate { get; set; }
-        public DateTime LastEpisodeDate { get; set; }
+        public DateTime? FirstEpisodeDate { get; set; }
+        public DateTime? LastEpisodeDate { get; set; }
 
         public ICollection<Episode> Episodes { get; set; }
     }

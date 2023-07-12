@@ -1,4 +1,6 @@
 ﻿using Dapper;
+using DoctorWho.Db.DatabaseContext;
+using DoctorWho.Db.Entities;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
@@ -13,7 +15,7 @@ namespace DoctorWho.Db.Repositories
         public CompanionRepository(DoctorWhoCoreDbContext context)
         {
             _context = context;
-             _connectionString = "Server=(localdb)\\MSSQLLocalDB;Database=DoctorWhoCore;Trusted_Connection=True;";
+            _connectionString = "Server=(localdb)\\MSSQLLocalDB;Database=DoctorWhoCore;Trusted_Connection=True;";
 
         }
 
