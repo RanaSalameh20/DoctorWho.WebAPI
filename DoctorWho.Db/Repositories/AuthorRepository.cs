@@ -64,6 +64,9 @@ namespace DoctorWho.Db.Repositories
             _context.SaveChanges();
         }
 
-
+        public void SaveChanges(Author author)
+        {
+            _context.SaveChanges();
+        }
     }
 }
