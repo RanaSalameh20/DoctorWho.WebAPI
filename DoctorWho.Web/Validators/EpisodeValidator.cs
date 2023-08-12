@@ -6,8 +6,7 @@ namespace DoctorWho.Web.Validators
     public class EpisodeValidator : AbstractValidator<EpisodeDto>
     {
         public EpisodeValidator() { 
-            RuleFor(e => e.EpisodeNumber).NotEmpty();
-            RuleFor(e => e.EpisodeType).NotEmpty();
+            
             RuleFor(e => e.Title)
                 .NotEmpty()
                 .MaximumLength(100);

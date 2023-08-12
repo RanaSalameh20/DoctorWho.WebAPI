@@ -100,6 +100,9 @@ namespace DoctorWho.Db.Repositories
             }
         }
 
-
+        public Enemy? GetEnemyById(int enemyId)
+        {
+            return _context.Enemies.FirstOrDefault(e => e.EnemyId == enemyId);
+        }
     }
 }

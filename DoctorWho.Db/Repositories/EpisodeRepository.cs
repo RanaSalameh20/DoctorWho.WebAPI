@@ -3,6 +3,8 @@ using DoctorWho.Db.DatabaseContext;
 using DoctorWho.Db.Entities;
 using DoctorWho.Db.ViewsModels;
 using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace DoctorWho.Db.Repositories
 {
@@ -13,15 +15,16 @@ namespace DoctorWho.Db.Repositories
         private readonly DoctorRepository _doctorRepository;
         private readonly string _connectionString;
 
-        public EpisodeRepository(DoctorWhoCoreDbContext context,
-            AuthorRepository authorRepository, DoctorRepository doctorRepository
+        public EpisodeRepository(DoctorWhoCoreDbContext context
+            ,AuthorRepository authorRepository
+            ,DoctorRepository doctorRepository
+            ,IConfiguration configuration
             )
         {
             _context = context;
             _authorRepository = authorRepository;
             _doctorRepository = doctorRepository;
-            _connectionString = "Server=(localdb)\\MSSQLLocalDB;Database=DoctorWhoCore;Trusted_Connection=True;";
-
+            _connectionString = configuration.GetConnectionString("DBConnectionString");
         }
         public void CreateEpisode(int seriesNumber, int episodeNumber, string episodeType, string title, DateTime episodeDate, int authorId, int? doctorId)
         {
@@ -111,31 +114,19 @@ namespace DoctorWho.Db.Repositories
 
             _context.SaveChanges();
         }
-        public void EpisodesView()
+        public Episode? GetEpisodeById(int episodeId)
+        {
+            return _context.Episodes.Include(e => e.Companions).FirstOrDefault(e => e.EpisodeId == episodeId);
+        }
+        public IEnumerable<EpisodeView> EpisodesView()
         {
             using (var connection = new SqlConnection(_connectionString))
             {
                 connection.Open();
 
                 var episodes = connection.Query<EpisodeView>("SELECT * FROM ViewEpisodes");
-
-                foreach (var episode in episodes)
-                {
-                    Console.WriteLine($"Episode ID: {episode.EpisodeId}");
-                    Console.WriteLine($"Series Number: {episode.SeriesNumber}");
-                    Console.WriteLine($"Episode Number: {episode.EpisodeNumber}");
-                    Console.WriteLine($"Episode Type: {episode.EpisodeType}");
-                    Console.WriteLine($"Title: {episode.Title}");
-                    Console.WriteLine($"Episode Date: {episode.EpisodeDate}");
-                    Console.WriteLine($"Author ID: {episode.AuthorId}");
-                    Console.WriteLine($"Doctor ID: {episode.DoctorId}");
-                    Console.WriteLine($"Author: {episode.Author}");
-                    Console.WriteLine($"Doctor: {episode.Doctor}");
-                    Console.WriteLine($"Companions: {episode.Companions}");
-                    Console.WriteLine($"Enemies: {episode.Enemies}");
-
-                }
-
+                
+                return episodes;
             }
         }
     }

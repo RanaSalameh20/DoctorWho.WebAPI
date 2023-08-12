@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using DoctorWho.Db.Entities;
+using DoctorWho.Db.ViewsModels;
 using DoctorWho.Web.Models;
 
 namespace DoctorWho.Web.Profiles
@@ -10,6 +11,7 @@ namespace DoctorWho.Web.Profiles
         {
             CreateMap<Episode, EpisodeDto>();
             CreateMap<EpisodeDto, Episode>();
+            CreateMap<EpisodeView, EpisodeDto>();
         }
     }
 }

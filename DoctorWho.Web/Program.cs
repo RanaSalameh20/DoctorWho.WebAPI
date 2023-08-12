@@ -21,6 +21,10 @@ builder.Services.AddDbContext<DoctorWhoCoreDbContext>(
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddScoped<DoctorRepository>();
+builder.Services.AddScoped<EpisodeRepository>();
+builder.Services.AddScoped<CompanionRepository>();
+builder.Services.AddScoped<EnemyRepository>();
+builder.Services.AddScoped<AuthorRepository>();
 
 builder.Services.AddFluentValidation();
 builder.Services.AddScoped<IValidator<AuthorDto>, AuthorValidator>();
