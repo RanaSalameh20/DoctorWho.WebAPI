@@ -3,9 +3,9 @@ using FluentValidation;
 
 namespace DoctorWho.Web.Validators
 {
-    public class AuthorDtoValidator : AbstractValidator<AuthorDto>
+    public class AuthorValidator : AbstractValidator<AuthorDto>
     {
-        public AuthorDtoValidator()
+        public AuthorValidator()
         {
             RuleFor(a => a.AuthorName).NotEmpty().MaximumLength(100);
         }

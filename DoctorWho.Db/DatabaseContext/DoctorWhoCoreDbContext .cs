@@ -20,19 +20,15 @@ namespace DoctorWho.Db.DatabaseContext
         public DbSet<FrequerntCompinaion> FrequerntCompinaions { get; set; }
         public DbSet<FrequentEnemy> FrequentEnemies { get; set; }
 
-        // Configuring
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        public DoctorWhoCoreDbContext(DbContextOptions<DoctorWhoCoreDbContext> options)
+            :base(options)
         {
-            if (!optionsBuilder.IsConfigured)
-            {
-                string connectionString = "Server=(localdb)\\MSSQLLocalDB;Database=DoctorWhoCore;Trusted_Connection=True;";
-                optionsBuilder.UseSqlServer(connectionString);
-            }
-        }
 
+        }
+       
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-
+          
             modelBuilder.Entity<Enemy>().HasData(
                 new Enemy { EnemyId = 1, EnemyName = "Sawsan", Description = "Red Enemy" },
                 new Enemy { EnemyId = 2, EnemyName = "Firas", Description = "Green Enemy" },
