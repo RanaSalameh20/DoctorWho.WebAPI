@@ -1,10 +1,7 @@
-﻿using AutoMapper;
-using DoctorWho.Db.DatabaseContext;
-using DoctorWho.Db.Entities;
+﻿using DoctorWho.Db.DatabaseContext;
 using DoctorWho.Db.Repositories;
 using DoctorWho.Web.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace DoctorWho.Web.Controllers
 {
@@ -12,30 +9,29 @@ namespace DoctorWho.Web.Controllers
     [ApiController]
     public class EpisodesController : Controller
     {
-        private readonly DoctorWhoCoreDbContext _context;
         private readonly EpisodeRepository _episodeRepository;
+        private readonly AuthorRepository _authorRepository;
+        private readonly DoctorRepository _doctorRepository;
         private readonly EnemyRepository _enemyRepository;
-        private readonly IMapper _mapper;
-
 
         public EpisodesController(DoctorWhoCoreDbContext context
             , EpisodeRepository episodeRepository
-            , IMapper mapper
+            , AuthorRepository authorRepository
+            , DoctorRepository doctorRepository
             , EnemyRepository enemyRepository)
         {
-            _context = context;
             _episodeRepository = episodeRepository;
-            _mapper = mapper;
             _enemyRepository = enemyRepository;
+            _authorRepository = authorRepository;
+            _doctorRepository = doctorRepository;
         }
 
 
         [HttpGet]
         public ActionResult<IEnumerable<DoctorDto>> GetAllEpisodes()
         {
-            var episodesView = _episodeRepository.EpisodesView();
 
-            var episodesDtos = _mapper.Map<IEnumerable<EpisodeDto>>(episodesView);
+            var episodesDtos = _episodeRepository.GetAllEpisodesFromView();
 
             return Ok(episodesDtos);
         }
@@ -43,7 +39,7 @@ namespace DoctorWho.Web.Controllers
         [HttpPost("CreateEpisode")]
         public ActionResult<EpisodeDto> CreateEpisode([FromBody] EpisodeDto episodeDto)
         {
-            var author = _context.Authors.FirstOrDefault(a => a.AuthorId == episodeDto.AuthorId);
+            var author = _authorRepository.GetAuthorById(episodeDto.AuthorId);  
             if (author == null)
             {
                 return BadRequest("The specified author does not exist. Create the author before creating the episode.");
@@ -51,18 +47,14 @@ namespace DoctorWho.Web.Controllers
 
             if (episodeDto.DoctorId.HasValue)
             {
-                var doctor = _context.Doctors.FirstOrDefault(d => d.DoctorId == episodeDto.DoctorId.Value);
+                var doctor = _doctorRepository.GetDoctorById(episodeDto.DoctorId.Value);
                 if (doctor == null)
                 {
                     return BadRequest("The specified doctor does not exist. Create the doctor before creating the episode.");
                 }
             }
+            var createdEpisodeDto = _episodeRepository.CreateEpisode(episodeDto);
 
-            var episodeEntity = _mapper.Map<Episode>(episodeDto);
-            _context.Episodes.Add(episodeEntity);
-            _context.SaveChanges();
-
-            var createdEpisodeDto = _mapper.Map<EpisodeDto>(episodeEntity);
             return Ok(createdEpisodeDto);
         }
 
@@ -81,20 +73,8 @@ namespace DoctorWho.Web.Controllers
                 return BadRequest("The specified enemy does not exist");
             }
 
-            episode.Enemies.Add(enemy);
-
-            _context.SaveChanges();
-
-            var enemyDto = _mapper.Map<EnemyDto>(enemy);
-            var episodeDto = _mapper.Map<EpisodeDto>(episode);
-
-            var episodeAndEnemyDto = new EpisodeAndEnemyDto
-            {
-                Episode = episodeDto,
-                Enemy = enemyDto
-
-            };
-
+            var episodeAndEnemyDto = _episodeRepository.AddExistingEnemyToExistingEpisode(episode, enemy);
+           
             return Ok(episodeAndEnemyDto);
         }
 
@@ -108,15 +88,9 @@ namespace DoctorWho.Web.Controllers
                 return BadRequest("The specified episode does not exist");
             }
 
-            var companionEntity = _mapper.Map<Companion>(companionDto);
+            var episodeAndCompanionDto = _episodeRepository.AddNewCompanionToExistingEpisode(episode, companionDto);
 
-            episode.Companions.Add(companionEntity);
-
-            _context.SaveChanges();
-
-            var createdCompanionDto = _mapper.Map<CompanionDto>(companionEntity);
-
-            return Ok(createdCompanionDto);
+            return Ok(episodeAndCompanionDto);
         }
     }
 }

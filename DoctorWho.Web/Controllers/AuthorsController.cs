@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using DoctorWho.Db.Repositories;
+﻿using DoctorWho.Db.Repositories;
 using DoctorWho.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,12 +7,10 @@ namespace DoctorWho.Web.Controllers
     public class AuthorsController : Controller
     {
         private readonly AuthorRepository _authorRepository;
-        private readonly IMapper _mapper;
 
-        public AuthorsController(AuthorRepository authorRepository, IMapper mapper)
+        public AuthorsController(AuthorRepository authorRepository)
         {
             _authorRepository = authorRepository;
-            _mapper = mapper;
         }
 
         [HttpPut("{authorId}")]
@@ -25,10 +22,8 @@ namespace DoctorWho.Web.Controllers
             {
                 return NotFound("Author not found");
             }
-
-            _mapper.Map(authorDto, author);
-            _authorRepository.SaveChanges(author);
-
+             
+            _authorRepository.UpdateAuthor(author, authorDto);
             return NoContent();
         }
     

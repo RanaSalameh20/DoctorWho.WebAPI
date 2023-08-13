@@ -4,6 +4,7 @@ using DoctorWho.Db.Entities;
 using DoctorWho.Db.ProceduresModels;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System.Data;
 
 namespace DoctorWho.Db.Repositories
@@ -11,12 +12,13 @@ namespace DoctorWho.Db.Repositories
     public class EnemyRepository
     {
         private readonly DoctorWhoCoreDbContext _context;
-        private string _connectionString;
+        private readonly string _connectionString;
 
-        public EnemyRepository(DoctorWhoCoreDbContext context)
+        public EnemyRepository(DoctorWhoCoreDbContext context
+            ,IConfiguration configuration)
         {
             _context = context;
-            _connectionString = "Server=(localdb)\\MSSQLLocalDB;Database=DoctorWhoCore;Trusted_Connection=True;";
+            _connectionString = configuration.GetConnectionString("DBConnectionString");
         }
         void CreateEnemy(string enemyName, string description)
         {

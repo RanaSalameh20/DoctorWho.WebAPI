@@ -3,6 +3,7 @@ using DoctorWho.Db.DatabaseContext;
 using DoctorWho.Db.Entities;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System.Data;
 
 namespace DoctorWho.Db.Repositories
@@ -12,10 +13,11 @@ namespace DoctorWho.Db.Repositories
         private readonly DoctorWhoCoreDbContext _context;
         private readonly string _connectionString;
 
-        public CompanionRepository(DoctorWhoCoreDbContext context)
+        public CompanionRepository(DoctorWhoCoreDbContext context
+            ,IConfiguration configuration)
         {
             _context = context;
-            _connectionString = "Server=(localdb)\\MSSQLLocalDB;Database=DoctorWhoCore;Trusted_Connection=True;";
+            _connectionString = configuration.GetConnectionString("DBConnectionString");
 
         }
 

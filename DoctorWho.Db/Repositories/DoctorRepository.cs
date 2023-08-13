@@ -1,5 +1,7 @@
-﻿using DoctorWho.Db.DatabaseContext;
+﻿using AutoMapper;
+using DoctorWho.Db.DatabaseContext;
 using DoctorWho.Db.Entities;
+using DoctorWho.Web.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace DoctorWho.Db.Repositories
@@ -7,49 +9,27 @@ namespace DoctorWho.Db.Repositories
     public class DoctorRepository
     {
         private readonly DoctorWhoCoreDbContext _context;
+        private readonly IMapper _mapper;
 
-        public DoctorRepository(DoctorWhoCoreDbContext context)
+        public DoctorRepository(DoctorWhoCoreDbContext context
+            ,IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
-        public void CreateDoctor(int doctorNumber, string doctorName,
-                DateTime birthDate, DateTime firstEpisodeDate, DateTime lastEpisodeDate)
+        public DoctorDto CreateDoctor(DoctorDto doctorDto)
         {
-            var doctor = new Doctor
-            {
-                DoctorNumber = doctorNumber,
-                DoctorName = doctorName,
-                BirthDate = birthDate,
-                FirstEpisodeDate = firstEpisodeDate,
-                LastEpisodeDate = lastEpisodeDate,
-
-
-            };
-            _context.Doctors.Add(doctor);
+            var doctorEntity = _mapper.Map<Doctor>(doctorDto);
+            _context.Doctors.Add(doctorEntity);
             _context.SaveChanges();
+
+            var createdDoctorDto = _mapper.Map<DoctorDto>(doctorEntity);
+            return createdDoctorDto;
         }
 
-        public void UpdateDoctor(int doctorId, string newDoctorName, DateTime newBirthDate, int episodeId)
+        public void UpdateDoctor(Doctor doctor, DoctorDto doctorDto)
         {
-            var doctor = _context.Doctors.FirstOrDefault(d => d.DoctorId == doctorId);
-            var episode = _context.Episodes.FirstOrDefault(e => e.EpisodeId == episodeId);
-
-            if (doctor != null)
-            {
-                doctor.DoctorName = newDoctorName;
-                doctor.BirthDate = newBirthDate;
-            }
-            else
-            {
-                Console.WriteLine($"No Doctor with id = {doctorId}");
-                return;
-            }
-            if (episode != null)
-            {
-                doctor.Episodes.Add(episode);
-            }
-
-            _context.SaveChanges();
+            _mapper.Map(doctorDto, doctor);
         }
         public void DeleteDoctor(int doctorId)
         {
@@ -74,14 +54,19 @@ namespace DoctorWho.Db.Repositories
             return null;
         }
 
-        public IEnumerable<Doctor> GetAllDoctors()
+        public IEnumerable<DoctorDto> GetAllDoctors()
         {
             var doctors = _context.Doctors
                 .Include(d => d.Episodes)
                 .ToList();
-            return doctors;           
+            var doctorDtos = _mapper.Map<IEnumerable<DoctorDto>>(doctors);
+            return doctorDtos;           
         }
 
+        public Doctor? GetDoctorById(int doctorId)
+        {
+            return _context.Doctors.FirstOrDefault(d => d.DoctorId == doctorId);
+        }
         public bool DoctorExist(int id)
         {
             return _context.Doctors.Any(d => d.DoctorId == id);

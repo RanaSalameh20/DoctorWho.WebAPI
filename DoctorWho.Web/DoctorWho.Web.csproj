@@ -23,6 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\DoctorWho.Common\DoctorWho.Common.csproj" />
     <ProjectReference Include="..\DoctorWho.Db\DoctorWho.Db.csproj" />
   </ItemGroup>
 

@@ -1,10 +1,14 @@
-﻿using Dapper;
+﻿using AutoMapper;
+using Dapper;
 using DoctorWho.Db.DatabaseContext;
 using DoctorWho.Db.Entities;
 using DoctorWho.Db.ViewsModels;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using DoctorWho.Web.Models;
+using System;
+using DoctorWho.Common.Models;
 
 namespace DoctorWho.Db.Repositories
 {
@@ -14,43 +18,28 @@ namespace DoctorWho.Db.Repositories
         private readonly AuthorRepository _authorRepository;
         private readonly DoctorRepository _doctorRepository;
         private readonly string _connectionString;
+        private IMapper _mapper;
 
         public EpisodeRepository(DoctorWhoCoreDbContext context
             ,AuthorRepository authorRepository
             ,DoctorRepository doctorRepository
             ,IConfiguration configuration
-            )
+            ,IMapper mapper)
         {
             _context = context;
             _authorRepository = authorRepository;
             _doctorRepository = doctorRepository;
             _connectionString = configuration.GetConnectionString("DBConnectionString");
+            _mapper = mapper;   
         }
-        public void CreateEpisode(int seriesNumber, int episodeNumber, string episodeType, string title, DateTime episodeDate, int authorId, int? doctorId)
+        public EpisodeDto CreateEpisode(EpisodeDto episodeDto)
         {
-            var author = _authorRepository.GetAuthorById(authorId);
-            if (author != null)
-            {
-                var episode = new Episode
-                {
-                    SeriesNumber = seriesNumber,
-                    EpisodeNumber = episodeNumber,
-                    EpisodeType = episodeType,
-                    Title = title,
-                    EpisodeDate = episodeDate,
-                    Author = author
-                };
+            var episodeEntity = _mapper.Map<Episode>(episodeDto);
+            _context.Episodes.Add(episodeEntity);
+            _context.SaveChanges();
 
-                var doctor = _doctorRepository.GetDoctorById(doctorId);
-
-                if (doctor != null)
-                {
-                    episode.Doctor = doctor;
-                }
-
-                _context.Episodes.Add(episode);
-                _context.SaveChanges();
-            }
+            var createdEpisodeDto = _mapper.Map<EpisodeDto>(episodeEntity);
+            return createdEpisodeDto;
 
         }
         public void UpdateEpisode(int episodeId, string newEpisodeTitle, DateTime newEpisodeDate, int newAuthorId)
@@ -88,45 +77,57 @@ namespace DoctorWho.Db.Repositories
 
             _context.SaveChanges();
         }
-        public void AddEnemyToEpisode()
+        public EpisodeAndEnemyDto AddExistingEnemyToExistingEpisode(Episode episode, Enemy enemy)
         {
-            var enemy1 = _context.Enemies.Find(1);
-            var enemy2 = _context.Enemies.Find(2);
-            var episode = _context.Episodes.Find(2);
-
-            episode.Enemies.Add(enemy1);
-            episode.Enemies.Add(enemy2);
+            episode.Enemies.Add(enemy);
 
             _context.SaveChanges();
+
+            var enemyDto = _mapper.Map<EnemyDto>(enemy);
+            var episodeDto = _mapper.Map<EpisodeDto>(episode);
+
+            var episodeAndEnemyDto = new EpisodeAndEnemyDto
+            {
+                Episode = episodeDto,
+                Enemy = enemyDto
+
+            };
+            return episodeAndEnemyDto;
         }
-        public void addCompanionToEpisode()
+        public EpisodeAndCompanionDto AddNewCompanionToExistingEpisode(Episode episode, CompanionDto companionDto)
         {
-            var companion1 = _context.Companions.Find(4);
-            var companion2 = _context.Companions.Find(5);
-            var companion3 = _context.Companions.Find(6);
-            var episode1 = _context.Episodes.Find(4);
-            var episode2 = _context.Episodes.Find(5);
+            var companionEntity = _mapper.Map<Companion>(companionDto);
 
-            episode1.Companions.Add(companion1);
-            episode1.Companions.Add(companion2);
-            episode1.Companions.Add(companion3);
-            episode2.Companions.Add(companion1);
+            episode.Companions.Add(companionEntity);
 
             _context.SaveChanges();
+
+            var createdCompanionDto = _mapper.Map<CompanionDto>(companionEntity);
+            var episodeDto = _mapper.Map<EpisodeDto>(episode);
+
+            var episodeAndCompanionDto = new EpisodeAndCompanionDto
+            {
+                Episode = episodeDto,
+                Companion = createdCompanionDto
+
+            };
+            return episodeAndCompanionDto;
         }
         public Episode? GetEpisodeById(int episodeId)
         {
             return _context.Episodes.Include(e => e.Companions).FirstOrDefault(e => e.EpisodeId == episodeId);
         }
-        public IEnumerable<EpisodeView> EpisodesView()
+        public IEnumerable<EpisodeDto> GetAllEpisodesFromView()
         {
             using (var connection = new SqlConnection(_connectionString))
             {
                 connection.Open();
 
-                var episodes = connection.Query<EpisodeView>("SELECT * FROM ViewEpisodes");
+                var allEpisodes = connection.Query<EpisodeView>("SELECT * FROM ViewEpisodes");
                 
-                return episodes;
+                var allEpisodesDtos = _mapper.Map<IEnumerable<EpisodeDto>>(allEpisodes);
+
+                return allEpisodesDtos;
             }
         }
     }

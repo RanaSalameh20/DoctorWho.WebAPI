@@ -1,5 +1,7 @@
-﻿using DoctorWho.Db.DatabaseContext;
+﻿using AutoMapper;
+using DoctorWho.Db.DatabaseContext;
 using DoctorWho.Db.Entities;
+using DoctorWho.Web.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace DoctorWho.Db.Repositories
@@ -7,10 +9,13 @@ namespace DoctorWho.Db.Repositories
     public class AuthorRepository
     {
         private readonly DoctorWhoCoreDbContext _context;
+        private IMapper _mapper;
 
-        public AuthorRepository(DoctorWhoCoreDbContext context)
+        public AuthorRepository(DoctorWhoCoreDbContext context
+            ,IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
         void CreateAuthor(string authorName)
         {
@@ -28,27 +33,12 @@ namespace DoctorWho.Db.Repositories
             var author = _context.Authors.FirstOrDefault(a => a.AuthorId == authorId);
             return author;
         }
-        void UpdateAuthor(int authorId, string newAuthorName)
+        public void UpdateAuthor(Author author, AuthorDto authorDto)
         {
-            var episode = new Episode()
-            {
-                SeriesNumber = 6,
-                EpisodeNumber = 4,
-                EpisodeType = "NotRegular",
-                Title = "The moon",
-                EpisodeDate = DateTime.Now,
-            };
-
-            var author = _context.Authors.FirstOrDefault(a => a.AuthorId == authorId);
-
-            if (author != null)
-            {
-                author.AuthorName = newAuthorName;
-                author.Episodes.Add(episode);
-            }
+            _mapper.Map(authorDto, author);
 
             _context.SaveChanges();
-            Console.WriteLine("gone");
+            
         }
         void DeleteAuthor(int authorId)
         {
@@ -61,11 +51,6 @@ namespace DoctorWho.Db.Repositories
                 _context.Authors.Remove(author);
             }
 
-            _context.SaveChanges();
-        }
-
-        public void SaveChanges(Author author)
-        {
             _context.SaveChanges();
         }
     }
