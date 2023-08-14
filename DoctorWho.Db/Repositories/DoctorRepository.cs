@@ -17,57 +17,57 @@ namespace DoctorWho.Db.Repositories
             _context = context;
             _mapper = mapper;
         }
-        public DoctorDto CreateDoctor(DoctorDto doctorDto)
+        public async Task<DoctorDto> CreateDoctor(DoctorDto doctorDto)
         {
             var doctorEntity = _mapper.Map<Doctor>(doctorDto);
             _context.Doctors.Add(doctorEntity);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             var createdDoctorDto = _mapper.Map<DoctorDto>(doctorEntity);
             return createdDoctorDto;
         }
 
-        public void UpdateDoctor(Doctor doctor, DoctorDto doctorDto)
+        public async Task<DoctorDto> UpdateDoctor(Doctor doctor, DoctorDto doctorDto)
         {
-            _mapper.Map(doctorDto, doctor);
+            var updatedDoctor = _mapper.Map(doctorDto, doctor);
+            await _context.SaveChangesAsync();
+
+            var updatedDoctorDto = _mapper.Map<DoctorDto>(updatedDoctor);
+            return updatedDoctorDto;
         }
-        public void DeleteDoctor(int doctorId)
+        public async Task DeleteDoctor(int doctorId)
         {
-            var doctor = GetDoctorById(doctorId);
+            var doctor = await GetDoctorById(doctorId);
             if (doctor != null)
             {
                 _context.Doctors.Remove(doctor);
 
             }
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
-        public Doctor? GetDoctorById(int? doctorId)
+        public async Task<Doctor?> GetDoctorById(int? doctorId)
         {
             if (doctorId.HasValue)
             {
-                var doctor = _context.Doctors
+                var doctor = await _context.Doctors
                     .Include(d => d.Episodes)
-                    .FirstOrDefault(d => d.DoctorId == doctorId);
+                    .FirstOrDefaultAsync(d => d.DoctorId == doctorId);
                 return doctor;
             }
 
             return null;
         }
 
-        public IEnumerable<DoctorDto> GetAllDoctors()
+        public async Task<IEnumerable<DoctorDto>> GetAllDoctors()
         {
-            var doctors = _context.Doctors
+            var doctors = await _context.Doctors
                 .Include(d => d.Episodes)
-                .ToList();
+                .ToListAsync();
             var doctorDtos = _mapper.Map<IEnumerable<DoctorDto>>(doctors);
             return doctorDtos;           
         }
 
-        public Doctor? GetDoctorById(int doctorId)
-        {
-            return _context.Doctors.FirstOrDefault(d => d.DoctorId == doctorId);
-        }
-        public bool DoctorExist(int id)
+        public async Task<bool> IsDoctorExistAsync(int id)
         {
             return _context.Doctors.Any(d => d.DoctorId == id);
         }

@@ -7,7 +7,6 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using DoctorWho.Web.Models;
-using System;
 using DoctorWho.Common.Models;
 
 namespace DoctorWho.Db.Repositories
@@ -18,70 +17,51 @@ namespace DoctorWho.Db.Repositories
         private readonly AuthorRepository _authorRepository;
         private readonly DoctorRepository _doctorRepository;
         private readonly string _connectionString;
-        private IMapper _mapper;
+        private readonly IMapper _mapper;
 
         public EpisodeRepository(DoctorWhoCoreDbContext context
-            ,AuthorRepository authorRepository
-            ,DoctorRepository doctorRepository
-            ,IConfiguration configuration
-            ,IMapper mapper)
+            , AuthorRepository authorRepository
+            , DoctorRepository doctorRepository
+            , IConfiguration configuration
+            , IMapper mapper)
         {
             _context = context;
             _authorRepository = authorRepository;
             _doctorRepository = doctorRepository;
             _connectionString = configuration.GetConnectionString("DBConnectionString");
-            _mapper = mapper;   
+            _mapper = mapper;
         }
-        public EpisodeDto CreateEpisode(EpisodeDto episodeDto)
+        public async Task<EpisodeDto> CreateEpisode(EpisodeDto episodeDto)
         {
             var episodeEntity = _mapper.Map<Episode>(episodeDto);
             _context.Episodes.Add(episodeEntity);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             var createdEpisodeDto = _mapper.Map<EpisodeDto>(episodeEntity);
             return createdEpisodeDto;
 
         }
-        public void UpdateEpisode(int episodeId, string newEpisodeTitle, DateTime newEpisodeDate, int newAuthorId)
+        public async Task UpdateEpisode(Episode episode, EpisodeDto episodeDto)
         {
-            var episode = _context.Episodes.FirstOrDefault(e => e.EpisodeId == episodeId);
-            var author = _context.Authors.FirstOrDefault(a => a.AuthorId == newAuthorId);
-
-            if (episode != null)
-            {
-                episode.Title = newEpisodeTitle;
-                episode.EpisodeDate = newEpisodeDate;
-            }
-            else
-            {
-                Console.WriteLine($"No episode with id = {episodeId}");
-                return;
-            }
-            if (author != null)
-            {
-                episode.Author = author;
-            }
-
-
-            _context.SaveChanges();
-            Console.WriteLine("done");
+            _mapper.Map(episodeDto, episode);
+            await _context.SaveChangesAsync();
         }
-        public void DeleteEpisode(int episodeId)
+        public async Task DeleteEpisode(int episodeId)
         {
-            var episode = _context.Episodes.FirstOrDefault(e => e.EpisodeId == episodeId);
+            var episode = await _context.Episodes.FirstOrDefaultAsync(e => e.EpisodeId == episodeId);
 
             if (episode != null)
             {
                 _context.Episodes.Remove(episode);
             }
 
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
-        public EpisodeAndEnemyDto AddExistingEnemyToExistingEpisode(Episode episode, Enemy enemy)
+        public async Task<EpisodeAndEnemyDto> AddEnemyToEpisode(Episode episode, Enemy enemy)
         {
             episode.Enemies.Add(enemy);
 
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             var enemyDto = _mapper.Map<EnemyDto>(enemy);
             var episodeDto = _mapper.Map<EpisodeDto>(episode);
@@ -94,13 +74,13 @@ namespace DoctorWho.Db.Repositories
             };
             return episodeAndEnemyDto;
         }
-        public EpisodeAndCompanionDto AddNewCompanionToExistingEpisode(Episode episode, CompanionDto companionDto)
+        public async Task<EpisodeAndCompanionDto> AddCompanionToEpisode(Episode episode, CompanionDto companionDto)
         {
             var companionEntity = _mapper.Map<Companion>(companionDto);
 
             episode.Companions.Add(companionEntity);
 
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             var createdCompanionDto = _mapper.Map<CompanionDto>(companionEntity);
             var episodeDto = _mapper.Map<EpisodeDto>(episode);
@@ -113,22 +93,19 @@ namespace DoctorWho.Db.Repositories
             };
             return episodeAndCompanionDto;
         }
-        public Episode? GetEpisodeById(int episodeId)
+        public async Task<Episode?> GetEpisodeById(int episodeId)
         {
-            return _context.Episodes.Include(e => e.Companions).FirstOrDefault(e => e.EpisodeId == episodeId);
+            return await _context.Episodes.Include(e => e.Companions).FirstOrDefaultAsync(e => e.EpisodeId == episodeId);
         }
-        public IEnumerable<EpisodeDto> GetAllEpisodesFromView()
+        public async Task<IEnumerable<EpisodeDto>> GetAllEpisodesFromView()
         {
-            using (var connection = new SqlConnection(_connectionString))
-            {
-                connection.Open();
+            using var connection = new SqlConnection(_connectionString);
+            connection.Open();
+            var allEpisodes = await connection.QueryAsync<EpisodeView>("SELECT * FROM ViewEpisodes");
 
-                var allEpisodes = connection.Query<EpisodeView>("SELECT * FROM ViewEpisodes");
-                
-                var allEpisodesDtos = _mapper.Map<IEnumerable<EpisodeDto>>(allEpisodes);
+            var allEpisodesDtos = _mapper.Map<IEnumerable<EpisodeDto>>(allEpisodes);
 
-                return allEpisodesDtos;
-            }
+            return allEpisodesDtos;
         }
     }
 }

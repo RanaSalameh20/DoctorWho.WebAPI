@@ -26,20 +26,19 @@ namespace DoctorWho.Web.Controllers
             _doctorRepository = doctorRepository;
         }
 
-
         [HttpGet]
-        public ActionResult<IEnumerable<DoctorDto>> GetAllEpisodes()
+        public async Task<ActionResult<IEnumerable<DoctorDto>>> GetAllEpisodes()
         {
 
-            var episodesDtos = _episodeRepository.GetAllEpisodesFromView();
+            var episodesDtos = await _episodeRepository.GetAllEpisodesFromView();
 
             return Ok(episodesDtos);
         }
 
         [HttpPost("CreateEpisode")]
-        public ActionResult<EpisodeDto> CreateEpisode([FromBody] EpisodeDto episodeDto)
+        public async Task<ActionResult<EpisodeDto>> CreateEpisode([FromBody] EpisodeDto episodeDto)
         {
-            var author = _authorRepository.GetAuthorById(episodeDto.AuthorId);  
+            var author = await _authorRepository.GetAuthorById(episodeDto.AuthorId);  
             if (author == null)
             {
                 return BadRequest("The specified author does not exist. Create the author before creating the episode.");
@@ -47,22 +46,22 @@ namespace DoctorWho.Web.Controllers
 
             if (episodeDto.DoctorId.HasValue)
             {
-                var doctor = _doctorRepository.GetDoctorById(episodeDto.DoctorId.Value);
+                var doctor = await _doctorRepository.GetDoctorById(episodeDto.DoctorId.Value);
                 if (doctor == null)
                 {
                     return BadRequest("The specified doctor does not exist. Create the doctor before creating the episode.");
                 }
             }
-            var createdEpisodeDto = _episodeRepository.CreateEpisode(episodeDto);
+            var createdEpisodeDto = await _episodeRepository.CreateEpisode(episodeDto);
 
             return Ok(createdEpisodeDto);
         }
 
-        [HttpPost("AddEnemyToEpisode/{episodeId}/{enemyId}")]
-        public ActionResult<EnemyDto> AddEnemyToEpisode(int episodeId, int enemyId)
+        [HttpPost("Episode/{episodeId}/Enemy/{enemyId}")]
+        public async Task<ActionResult<EnemyDto>> AddEnemyToEpisode(int episodeId, int enemyId)
         {
-            var episode = _episodeRepository.GetEpisodeById(episodeId);
-            var enemy = _enemyRepository.GetEnemyById(enemyId);
+            var episode = await _episodeRepository.GetEpisodeById(episodeId);
+            var enemy = await _enemyRepository.GetEnemyById(enemyId);
 
             if (episode == null)
             {
@@ -73,22 +72,22 @@ namespace DoctorWho.Web.Controllers
                 return BadRequest("The specified enemy does not exist");
             }
 
-            var episodeAndEnemyDto = _episodeRepository.AddExistingEnemyToExistingEpisode(episode, enemy);
+            var episodeAndEnemyDto = await _episodeRepository.AddEnemyToEpisode(episode, enemy);
            
             return Ok(episodeAndEnemyDto);
         }
 
-        [HttpPost("AddCompanionToEpisode/{episodeId}")]
-        public ActionResult<CompanionDto> AddCompanionToEpisode(int episodeId, [FromBody] CompanionDto companionDto)
+        [HttpPost("Episode/{episodeId}/Companion")]
+        public async Task<ActionResult<CompanionDto>> AddCompanionToEpisode(int episodeId, [FromBody] CompanionDto companionDto)
         {
-            var episode = _episodeRepository.GetEpisodeById(episodeId);
+            var episode = await _episodeRepository.GetEpisodeById(episodeId);
 
             if (episode == null)
             {
                 return BadRequest("The specified episode does not exist");
             }
 
-            var episodeAndCompanionDto = _episodeRepository.AddNewCompanionToExistingEpisode(episode, companionDto);
+            var episodeAndCompanionDto = await _episodeRepository.AddCompanionToEpisode(episode, companionDto);
 
             return Ok(episodeAndCompanionDto);
         }

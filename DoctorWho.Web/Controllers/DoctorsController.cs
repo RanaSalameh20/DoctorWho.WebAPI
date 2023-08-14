@@ -16,46 +16,46 @@ namespace DoctorWho.Web.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<DoctorDto>> GetAllDoctors()
+        public async Task<ActionResult<IEnumerable<DoctorDto>>> GetAllDoctors()
         {
-            var doctorDtos = _doctorRepository.GetAllDoctors();
+            var doctorDtos = await _doctorRepository.GetAllDoctors();
 
             return Ok(doctorDtos);
         }
 
         [HttpPost("upsert")]
-        public ActionResult<DoctorDto> UpsertDoctor([FromBody] DoctorDto doctorDto)
+        public async Task<ActionResult<DoctorDto>> UpsertDoctor([FromBody] DoctorDto doctorDto)
         {
-
+            DoctorDto upsartedDoctor;
             if (doctorDto.DoctorId > 0)
             {
-                var doctorEntity = _doctorRepository.GetDoctorById(doctorDto.DoctorId);
+                var doctorEntity = await _doctorRepository.GetDoctorById(doctorDto.DoctorId);
 
                 if (doctorEntity == null)
                 {
                     return NotFound("Doctor not found");
                 }
 
-                _doctorRepository.UpdateDoctor(doctorEntity, doctorDto);
-                return NoContent();
+                upsartedDoctor = await _doctorRepository.UpdateDoctor(doctorEntity, doctorDto);
+                return Ok(upsartedDoctor);
             }
 
-            var createdDoctorDto = _doctorRepository.CreateDoctor(doctorDto);
-            return Ok(createdDoctorDto);
+            upsartedDoctor = await _doctorRepository.CreateDoctor(doctorDto);
+            return Ok(upsartedDoctor);
 
         }
 
         [HttpDelete("{id}")]
-        public IActionResult DeleteDoctor(int id)
+        public async Task<ActionResult> DeleteDoctor(int id)
         {
-            var isDoctorExist = _doctorRepository.DoctorExist(id);
+            var isDoctorExist = await _doctorRepository.IsDoctorExistAsync(id);
 
             if (!isDoctorExist)
             {
                 return NotFound("Doctor not found");
             }
 
-            _doctorRepository.DeleteDoctor(id);
+            await _doctorRepository.DeleteDoctor(id);
 
             return NoContent(); 
         }

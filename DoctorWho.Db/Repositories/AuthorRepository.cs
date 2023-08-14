@@ -9,7 +9,7 @@ namespace DoctorWho.Db.Repositories
     public class AuthorRepository
     {
         private readonly DoctorWhoCoreDbContext _context;
-        private IMapper _mapper;
+        private readonly IMapper _mapper;
 
         public AuthorRepository(DoctorWhoCoreDbContext context
             ,IMapper mapper)
@@ -17,41 +17,39 @@ namespace DoctorWho.Db.Repositories
             _context = context;
             _mapper = mapper;
         }
-        void CreateAuthor(string authorName)
+        public async Task<AuthorDto> CreateAuthor(AuthorDto authorDto)
         {
-            var author = new Author
-            {
-                AuthorName = authorName
-            };
-
+            var author = _mapper.Map<Author>(authorDto);
             _context.Authors.Add(author);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
+            var createdAuthorDto = _mapper.Map<AuthorDto>(author);
+            return createdAuthorDto;
         }
-        public Author GetAuthorById(int authorId)
+        public async Task<Author?> GetAuthorById(int authorId)
         {
-            var author = _context.Authors.FirstOrDefault(a => a.AuthorId == authorId);
+            var author = await _context.Authors.FirstOrDefaultAsync(a => a.AuthorId == authorId);
             return author;
         }
-        public void UpdateAuthor(Author author, AuthorDto authorDto)
+        public async Task UpdateAuthor(Author author, AuthorDto authorDto)
         {
             _mapper.Map(authorDto, author);
 
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
             
         }
-        void DeleteAuthor(int authorId)
+        public async Task DeleteAuthor(int authorId)
         {
-            var author = _context.Authors
+            var author = await _context.Authors
                 .Include(a => a.Episodes)
-                .FirstOrDefault(a => a.AuthorId == authorId);
+                .FirstOrDefaultAsync(a => a.AuthorId == authorId);
 
             if (author != null)
             {
                 _context.Authors.Remove(author);
             }
 
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
     }
 }

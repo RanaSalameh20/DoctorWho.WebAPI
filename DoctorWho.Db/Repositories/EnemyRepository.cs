@@ -102,9 +102,9 @@ namespace DoctorWho.Db.Repositories
             }
         }
 
-        public Enemy? GetEnemyById(int enemyId)
+        public async Task<Enemy?> GetEnemyById(int enemyId)
         {
-            return _context.Enemies.FirstOrDefault(e => e.EnemyId == enemyId);
+            return await _context.Enemies.FirstOrDefaultAsync(e => e.EnemyId == enemyId);
         }
     }
 }
