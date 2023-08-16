@@ -11,13 +11,13 @@ namespace DoctorWho.Web.Controllers
     {
         private readonly EpisodeRepository _episodeRepository;
         private readonly AuthorRepository _authorRepository;
-        private readonly DoctorRepository _doctorRepository;
+        private readonly IDoctorRepository _doctorRepository;
         private readonly EnemyRepository _enemyRepository;
 
         public EpisodesController(DoctorWhoCoreDbContext context
             , EpisodeRepository episodeRepository
             , AuthorRepository authorRepository
-            , DoctorRepository doctorRepository
+            , IDoctorRepository doctorRepository
             , EnemyRepository enemyRepository)
         {
             _episodeRepository = episodeRepository;
@@ -77,8 +77,8 @@ namespace DoctorWho.Web.Controllers
             return Ok(episodeAndEnemyDto);
         }
 
-        [HttpPost("Episode/{episodeId}/Companion")]
-        public async Task<ActionResult<CompanionDto>> AddCompanionToEpisode(int episodeId, [FromBody] CompanionDto companionDto)
+        [HttpPost("Episode/Companion")]
+        public async Task<ActionResult<CompanionDto>> AddCompanionToEpisode([FromQuery] int episodeId, [FromBody] CompanionDto companionDto)
         {
             var episode = await _episodeRepository.GetEpisodeById(episodeId);
 

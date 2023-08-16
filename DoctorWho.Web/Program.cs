@@ -20,7 +20,7 @@ builder.Services.AddDbContext<DoctorWhoCoreDbContext>(
         builder.Configuration.GetConnectionString("DBConnectionString")));
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-builder.Services.AddScoped<DoctorRepository>();
+builder.Services.AddScoped<IDoctorRepository, DoctorRepository>();
 builder.Services.AddScoped<EpisodeRepository>();
 builder.Services.AddScoped<CompanionRepository>();
 builder.Services.AddScoped<EnemyRepository>();

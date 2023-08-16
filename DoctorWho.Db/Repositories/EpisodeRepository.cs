@@ -15,13 +15,13 @@ namespace DoctorWho.Db.Repositories
     {
         private readonly DoctorWhoCoreDbContext _context;
         private readonly AuthorRepository _authorRepository;
-        private readonly DoctorRepository _doctorRepository;
+        private readonly IDoctorRepository _doctorRepository;
         private readonly string _connectionString;
         private readonly IMapper _mapper;
 
         public EpisodeRepository(DoctorWhoCoreDbContext context
             , AuthorRepository authorRepository
-            , DoctorRepository doctorRepository
+            , IDoctorRepository doctorRepository
             , IConfiguration configuration
             , IMapper mapper)
         {

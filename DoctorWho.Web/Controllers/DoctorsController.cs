@@ -9,8 +9,8 @@ namespace DoctorWho.Web.Controllers
 
     public class DoctorsController : ControllerBase
     {
-        private readonly DoctorRepository _doctorRepository;
-        public DoctorsController(DoctorRepository doctorRepository)
+        private readonly IDoctorRepository _doctorRepository;
+        public DoctorsController(IDoctorRepository doctorRepository)
         {
             _doctorRepository = doctorRepository;
         }

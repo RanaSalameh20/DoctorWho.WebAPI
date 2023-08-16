@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DoctorWho.Web.Controllers
 {
+    [Route("[controller]")]
+    [ApiController]
     public class AuthorsController : Controller
     {
         private readonly AuthorRepository _authorRepository;
