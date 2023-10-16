@@ -1,0 +1,290 @@
+{
+	"info": {
+		"_postman_id": "db978e7d-4980-4f7b-b5e9-cd4bc4f6ed9b",
+		"name": "DoctorWho.API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "28294583"
+	},
+	"item": [
+		{
+			"name": "Doctor APIs",
+			"item": [
+				{
+					"name": "Get All Doctors",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:7026/Doctors",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "7026",
+							"path": [
+								"Doctors"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upsert Doctor (Invalid Data)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"doctorId\": 10,\r\n  \"doctorNumber\": 877,\r\n  \"doctorName\": \"\",\r\n  \"birthDate\": \"2023-08-11T23:20:48.771Z\",\r\n  \"firstEpisodeDate\":null,\r\n  \"lastEpisodeDate\": \"2022-08-11T23:20:48.771Z\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:7026/Doctors/upsert",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "7026",
+							"path": [
+								"Doctors",
+								"upsert"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upsert Doctor (Existing Doctor With Valid Data)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"doctorId\": 9,\r\n  \"doctorNumber\": 456722325,\r\n  \"doctorName\": \"doctor9\",\r\n  \"birthDate\": \"2023-08-16T17:29:28.735Z\",\r\n  \"firstEpisodeDate\": \"2023-08-16T17:29:28.735Z\",\r\n  \"lastEpisodeDate\": \"2027-08-16T17:29:28.735Z\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:7026/Doctors/upsert",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "7026",
+							"path": [
+								"Doctors",
+								"upsert"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upsert Doctor (New Doctor With Valid Data)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"doctorId\": 0,\r\n  \"doctorNumber\": 456722325,\r\n  \"doctorName\": \"doctor9\",\r\n  \"birthDate\": \"2023-08-16T17:29:28.735Z\",\r\n  \"firstEpisodeDate\": \"2023-08-16T17:29:28.735Z\",\r\n  \"lastEpisodeDate\": \"2027-08-16T17:29:28.735Z\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:7026/Doctors/upsert",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "7026",
+							"path": [
+								"Doctors",
+								"upsert"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Episode APIs",
+			"item": [
+				{
+					"name": "Get All Episodes",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:7026/Episodes",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "7026",
+							"path": [
+								"Episodes"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Episode ( Invalid Data)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"episodeId\": 0,\r\n  \"seriesNumber\": 0,\r\n  \"episodeNumber\": 0,\r\n  \"episodeType\": \"string\",\r\n  \"title\": \"string\",\r\n  \"episodeDate\": \"2023-08-16T17:57:41.714Z\",\r\n  \"notes\": \"string\",\r\n  \"authorId\": 0,\r\n  \"doctorId\": 0\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:7026/Episodes/CreateEpisode",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "7026",
+							"path": [
+								"Episodes",
+								"CreateEpisode"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Episode ( Valid Data)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"episodeId\": 0,\r\n  \"seriesNumber\": 1234567890,\r\n  \"episodeNumber\": 3,\r\n  \"episodeType\": \"string\",\r\n  \"title\": \"string\",\r\n  \"episodeDate\": \"2023-08-16T17:57:41.714Z\",\r\n  \"notes\": \"string\",\r\n  \"authorId\": 5,\r\n  \"doctorId\": 7\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:7026/Episodes/CreateEpisode",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "7026",
+							"path": [
+								"Episodes",
+								"CreateEpisode"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add Enemy To Episode",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:7026/Episodes/Episode/7/Enemy/4",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "7026",
+							"path": [
+								"Episodes",
+								"Episode",
+								"7",
+								"Enemy",
+								"4"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add Companion To Episode",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"companionName\": \"companion8\",\r\n  \"whoPlayed\": \"ali\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:7026/Episodes/Episode/Companion",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "7026",
+							"path": [
+								"Episodes",
+								"Episode",
+								"Companion"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Author APIs",
+			"item": [
+				{
+					"name": "New Request",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"authorName\": \"sameer\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:7026/Authors/5",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "7026",
+							"path": [
+								"Authors",
+								"5"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
